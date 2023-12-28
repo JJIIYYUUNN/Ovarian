@@ -23,7 +23,9 @@
 - 학습 이미지 예시
   |CT|초음파|
   |:--:|:--:|
-  |![image](https://github.com/JJIIYYUUNN/Ovarain/assets/125724830/987d0af6-9daf-412c-8358-9debf2a72bc3)|![image](https://github.com/JJIIYYUUNN/Ovarain/assets/125724830/3d69e7b7-4e1b-4afb-b5bd-8d02f4cf4ea1)|
+  |![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/0c38ffe0-e013-4177-b4b7-f7ccc88026b1)
+|![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/b3e5c758-4b29-45cd-a774-924a4db4d18d)
+|
 
 <br>
 
