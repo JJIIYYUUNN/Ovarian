@@ -31,7 +31,8 @@
   |CT 종양 영역 탐지 및 악성여부 예측|초음파 양성종양 영역 탐지 및 종양 유형(5개) 예측|
   |:--:|:--:|
   |95.5%(map50)|80.3% (map50)|
-  |![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/dcfc1918-d45f-43af-8492-4851ed6e5247)|![image](https://github.com/JJIIYYUUNN/Ovarain/assets/125724830/a38c85bd-3b82-4bf8-8e3c-67b33d503b41)|
+  |![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/ac2e6100-fce3-47a8-90d9-2b49caa104b7)|![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/a342411e-1d48-4e19-b3c9-ba600c556366)|
+
 
 <br>
 
