@@ -23,9 +23,7 @@
 - 학습 이미지 예시
   |CT|초음파|
   |:--:|:--:|
-  |![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/0c38ffe0-e013-4177-b4b7-f7ccc88026b1)
-|![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/b3e5c758-4b29-45cd-a774-924a4db4d18d)
-|
+  |![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/0c38ffe0-e013-4177-b4b7-f7ccc88026b1)|![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/b3e5c758-4b29-45cd-a774-924a4db4d18d)|
 
 <br>
 
@@ -33,7 +31,7 @@
   |CT 종양 영역 탐지 및 악성여부 예측|초음파 양성종양 영역 탐지 및 종양 유형(5개) 예측|
   |:--:|:--:|
   |95.5%(map50)|80.3% (map50)|
-  |![image](https://github.com/JJIIYYUUNN/Ovarain/assets/125724830/6bacdf28-6730-4ef7-8c12-e282fc94ab93)|![image](https://github.com/JJIIYYUUNN/Ovarain/assets/125724830/a38c85bd-3b82-4bf8-8e3c-67b33d503b41)|
+  |![image](https://github.com/JJIIYYUUNN/Ovarian/assets/125724830/dcfc1918-d45f-43af-8492-4851ed6e5247)|![image](https://github.com/JJIIYYUUNN/Ovarain/assets/125724830/a38c85bd-3b82-4bf8-8e3c-67b33d503b41)|
 
 <br>
 
