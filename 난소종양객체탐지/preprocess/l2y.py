@@ -185,14 +185,14 @@ def save_yolo_image_preprocess(json_data, json_path, image_dir_path, target_dir)
 
     return img_path
 
-def test_dataset_list(test_dir):
+def test_dataset_list(test_dir, data_type):
     
     import csv
     
     # test_dir = "/home/data/tmp_data/YOLODataset/images/test"
     file_list = os.listdir(test_dir)
     
-    f = open("/home/data/test_file_list.csv", "w", newline = '')
+    f = open(f"/home/data/{data_type}_test_file_list.csv", "w", newline = '')
     
     for num, file in enumerate(file_list):
         file_nm, ext = os.path.splitext(file)
@@ -557,8 +557,8 @@ if __name__ == '__main__':
 
     convertor._delete_labelme_file()
     
-    test_dataset_list("/home/data/tmp_data/YOLODataset/images/test")
+    test_dataset_list("/home/data/tmp_data/YOLODataset/images/test", args.data_type)
     
 # cd /home/data
 # python /home/src/preprocess/l2y.py --json_dir /home/data/tmp_data --val_size 0.1 --test_size 0.1 --label_list cancer benign --data_type CT
-# python /home/src/preprocess/l2y.py --json_dir /home/data/tmp_data --val_size 0.1 --test_size 0.1 --data_type 초음파
+# python /home/src/preprocess/l2y.py --json_dir /home/data/tmp_data --val_size 0.1 --test_size 0.1 --label_list 'Mature teratoma' 'Mucinous tumor' 'Serous tumor' 'Endometrioid tumor' 'Etc' --data_type 초음파

@@ -5,12 +5,11 @@ Created on Oct 17, 2023
 
 """
 
-# train :: nohup python /home/src/yolov8/yolo8_ready_seg.py --task train >  /home/src/log/CT_mid_train_2.log 2>&1 &
-# test :: python /home/src/yolov8/yolo8_ready_seg.py --task test --model_path /home/src/model/best_SONO_mid/weights/best.pt --dataset_path /home/data/best_SONO_mid_yolodata
+# train :: nohup python /home/src/yolov8/yolo8_ready_seg.py --task train >  /home/src/log/SONO_mid_train_2.log 2>&1 &
+# test :: python /home/src/yolov8/yolo8_ready_seg.py --task test --model_path /home/src/model/best_SONO_mid/weights/best.pt
 
-# (CT) predict :: python /home/src/yolov8/yolo8_ready_seg.py --task predict --model_path /home/src/model/best_CT_mid_sum/weights/best.pt --predict_path /home/data/best_CT_mid_yolodata/YOLODataset/images/test/10008_CTA_13.png
+# (CT) predict :: python /home/src/yolov8/yolo8_ready_seg.py --task predict --model_path /home/src/model/best_CT_mid/weights/best.pt --predict_path /home/data/best_CT_mid_yolodata/YOLODataset/images/test/10008_CTA_13.png
 # (초음파) predict :: python /home/src/yolov8/yolo8_ready_seg.py --task predict --model_path /home/src/model/best_SONO_mid_sum/weights/best.pt --predict_path /home/data/best_SONO_mid_yolodata/YOLODataset/images/test/13284_SONO_2.png
-
 
 
 import os
@@ -30,12 +29,10 @@ import numpy as np
 import pycocotools.mask as mask
 import cv2
 
-os.chdir("/home/src/yolov8")
+os.chdir("/home/src/yolov8") # 위치 설정
 os.getcwd()
-# row 생략 없이 출력
-pd.set_option('display.max_rows', None)
-# col 생략 없이 출력
-pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None) # row 생략 없이 출력
+pd.set_option('display.max_columns', None) # col 생략 없이 출력
 
 
 def polygonFromMask(maskedArr):
@@ -51,45 +48,6 @@ def polygonFromMask(maskedArr):
     if valid_poly == 0:
         raise ValueError
     return segmentation
-
-def draw_ploygon(png_file, json_file):
-    
-    img_array = np.fromfile(png_file, np.uint8)
-    rgb_image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-
-    with open (json_file, "r", encoding = "utf8") as f:
-        data = json.load(f)
-
-    filename = data["fileName"]
-    taskname = data["taskName"]
-    
-    resultData = data["resultData"]
-    
-
-    for num, detail in enumerate(resultData):
-        
-        label = resultData[num]['value']
-        poly = resultData[num]['points']
-        tumor_type = resultData[num]['value']
-        
-        points_lst = []
-        for pp in poly:
-            x_point = pp["x"]
-            y_point = pp["y"]
-            points_lst.append([x_point, y_point])
-        
-        pts = np.array(points_lst, dtype = np.int32)
-        
-        rst_draw = cv2.polylines(rgb_image, [pts], True, (0,0,255), 2)
-        
-        result, encoded_img = cv2.imencode(".png", rst_draw)
-        
-        if result:
-            with open(os.path.join("/home/src/yolov8/runs/segment/predict","Raw_{filename}.png"), mode='w+b') as f:
-                encoded_img.tofile(f)
-    
-    return True
-
     
 # 폴리곤 정보를 이미지 크기에 맞게 변환하는 함수
 def scale_polygon(poly, image_width, image_height):
@@ -144,7 +102,7 @@ def draw_segmentation_labels(png_dir, json_dir, save_dir):
     image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
     image_height, image_width, _ = image.shape
 
-    # 폴리곤과 클래스 라벨을 이미지에 그립니다.
+    # 폴리곤과 클래스 라벨을 이미지에 그리기
     draw_polygons_with_labels(image, boxes, class_labels)
     
     cv2.imwrite(save_dir, image)
@@ -153,8 +111,6 @@ def draw_segmentation_labels(png_dir, json_dir, save_dir):
 
 # set args
 parser = argparse.ArgumentParser(description='yolov8 - object detection')
-# parser.add_argument('--task',  default = "train",  type = str)
-# args = parser.parse_args()
 
 parser.add_argument(
     "--task",
@@ -184,13 +140,31 @@ parser.add_argument(
     "--dataset_path",
     type=str,
     nargs="?",
-    default=None,
+    default="/home/data/tmp_data",
     help="dataset path",
 )
 
 args = parser.parse_args()
 
-if args.task == "test":
+start = time.time()
+
+ori_yolo_data_path = "/home/data/tmp_data/YOLODataset"
+yaml_path = os.path.join(ori_yolo_data_path,"dataset.yaml")
+
+model_path = args.model_path
+
+if args.task == 'train':
+    
+    # Load a model - segmentation
+    model = YOLO("yolov8n-seg.yaml")  # build a new model from scratch
+    model = YOLO("yolov8n-seg.pt")  # load a pretrained model (recommended for training)
+
+    model.train(data=yaml_path, epochs=100, patience=30, batch=32, imgsz=512)
+    path = model.export(format="onnx")  # export the model to ONNX format
+
+
+elif args.task == 'test':
+    
     # set log
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -201,39 +175,14 @@ if args.task == "test":
     file_handler.setFormatter(formatter) ## 텍스트 포맷 설정
     logger.addHandler(file_handler) ## 핸들러 등록
 
-    logger.info(f'python /home/src/yolov8/yolo8_ready_seg.py --task {args.task} --model_path {args.model_path}')
+    logger.info(f'python /home/src/yolov8/yolo8_ready_seg.py --task {args.task} --model_path {args.model_path} --dataset_path {args.dataset_path}')
     
     logger.info(f'{args.task} - PROCESS_START')
     
     yolo_data_path = os.path.join(args.dataset_path,"YOLODataset")
     test_yaml_path = os.path.join(yolo_data_path,"dataset.yaml")
-
-
-
-start = time.time()
-
-
-ori_yolo_data_path = "/home/data/tmp_data/YOLODataset"
-yaml_path = os.path.join(ori_yolo_data_path,"dataset.yaml")
-
-model_path = args.model_path
-
-if args.task == 'train':
     
-    import wandb
-    run = wandb.init(project="CT_yolov8")
     
-    # Load a model - segmentation
-    model = YOLO("yolov8n-seg.yaml")  # build a new model from scratch
-    model = YOLO("yolov8n-seg.pt")  # load a pretrained model (recommended for training)
-
-    # model.train(data="/home/preprocess/labelme_data/YOLODataset/dataset.yaml", epochs=100, batch=32, imgsz=512)
-    model.train(data=yaml_path, epochs=300, patience=30, batch=32, imgsz=512)
-    # patience : 개선이 안된다고 바로 종료시키지 않고, 개선을 위해 몇번의 에포크를 기다릴지 설정 (val_loss가 1번 증가할 때 바로 학습을 멈추지 않고 10번의 에포크를 기다리고 학습을 종료)
-    path = model.export(format="onnx")  # export the model to ONNX format
-
-
-elif args.task == 'test':
     # yaml 파일의 평가 데이터 셋을 임시로 test 폴더로 변경
     
     with open(test_yaml_path, "r") as f:
@@ -247,15 +196,11 @@ elif args.task == 'test':
         yaml.dump(read_data, p)
 
     model = YOLO(model_path)
-    # metrics = model.val(model = "/home/runs/segment/train7/weights/best.pt", data = read_data, batch=32, imgsz=512)
     
     metrics = model.val(model = model_path, data = tmp_dir, batch=8, imgsz=512, save_json= True)
     
     if os.path.isfile(tmp_dir):
         os.remove(tmp_dir)
-
-    # metrics.confusion_matrix.matrix
-    # metrics.keys
     
     B_precison = metrics.results_dict["metrics/precision(B)"]
     B_recall = metrics.results_dict["metrics/precision(B)"]
@@ -290,17 +235,16 @@ elif args.task == 'test':
     logger.info(copy_df_rst)   
     
     logger.info(metrics)    
-    logger.info(f"✅ 평가 결과 \n➡️ mAP50-95 : {metrics.seg.map: .3f} \n➡️ mAP50 : {metrics.seg.map50: .3f} \n\n➡️ precison : {M_precison: .3f} \n➡️ recall : {M_recall: .3f} \n➡️ f1-score : {f1_score_M: .3f}")
+    logger.info(f"✅ 평가 결과 \n➡️ mAP : {metrics.seg.map50: .3f} \n\n➡️ precison : {M_precison: .3f} \n➡️ recall : {M_recall: .3f} \n➡️ f1-score : {f1_score_M: .3f}")
     
     # 모델 평가 결과 print
-    print(f"✅ 평가 결과 \n➡️   mAP50-95 : {metrics.seg.map: .3f} \n➡️   mAP50 : {metrics.seg.map50: .3f} \n➡️   f1-score : {f1_score_M: .3f}")
+    print(f"✅ 평가 결과 \n➡️   mAP : {metrics.seg.map50: .3f}")
   
     logger.info("FINISH")
 
 elif args.task == "predict":
     
     model = YOLO(model_path)
-    # result = model.predict(f"{yolo_data_path}/images/test/", save=True, save_txt = True, save_conf=True)
     result = model.predict(args.predict_path, save=True, save_conf=True)
     
     # 실제이미지에 라벨 그리기
@@ -313,7 +257,6 @@ elif args.task == "predict":
     save_dir = f"/home/src/yolov8/runs/segment/predict/ori_{nm}.png"
     
     draw_segmentation_labels(args.predict_path, lbl_path, save_dir)
-    
     
     
 else:
